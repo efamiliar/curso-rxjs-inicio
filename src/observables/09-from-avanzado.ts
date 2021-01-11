@@ -35,9 +35,9 @@ const miGenerador = function*(){
 const miIterable = miGenerador();
 
 //Modo iterable de js estandar
-/* for (let id of  miIterable){
-    console.log('iter:',id)
-} */
+for (let id of  miIterable){
+    console.log(id)
+}
 
 //modo con observables
 
