@@ -1,44 +1,51 @@
-import { from, Observer, of } from "rxjs";
+import { from, interval } from "rxjs";
+import { map, reduce, scan, take } from "rxjs/operators";
 
 
-const observer: Observer<any> = {
-    next: (next) => console.log('Next',next),
-    error: (error) => console.log(error),
-    complete: () => console.log('complete')
+/* interval(500).pipe(
+  take(6),
+  scan(
+    (ac: number, val:number) => ac + val, 0
+  )
+).subscribe(console.log) */
+
+
+const numeros = [1,2,3,4,5,6,7,8,9];
+
+const totalAcumula = (ac:number, val: number) => ac + val;
+
+from(numeros).pipe(
+  scan(totalAcumula,0)
+).subscribe(console.log);
+
+
+from(numeros).pipe(
+  reduce(totalAcumula,0)
+).subscribe(console.log);
+
+//Redux
+interface Usuario {
+  id?: string;
+  autenticado?: boolean;
+  token?:string;
+  edad?:number
 }
 
-//const source$ = from([1,2,3,4,5,6]);
-//const source$ = of([1,2,3,4,5,6]);
-/* const source$ = from('cadenas');
+const users: Usuario[] = [
+  {id:'est', autenticado:false, token:null},
+  {id:'est', autenticado:true, token:'ABC'},
+  {id:'est', autenticado:false},
+  {id:'est', autenticado:true, token:'SSS'},
+];
 
-source$.subscribe(
-    observer
+const state$ = from(users).pipe(
+  scan<Usuario>( ( acc, cur ) => {
+    return {...acc, ...cur}
+  }, { edad: 34 } )
 )
 
-const source2$ = from (fetch ('https://api.github.com/users/klerith'));
-source2$.subscribe(
-    async(resp) => {    
-        console.log(resp);
-        const  dataResp = await resp.json();
-        console.log(dataResp);
-    }
-) */
+const ids$ = state$.pipe(
+  map( state => state.id)
+);
 
-const miGenerador = function*(){
-    yield 1;
-    yield 2;
-    yield 3;
-    yield 4;
-    yield 5;
-}
-
-const miIterable = miGenerador();
-
-//Modo iterable de js estandar
-/* for (let id of  miIterable){
-    console.log('iter:',id)
-} */
-
-//modo con observables
-
-from(miIterable).subscribe(observer);
+state$.subscribe(console.log)
